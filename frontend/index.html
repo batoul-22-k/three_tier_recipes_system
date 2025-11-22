@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Recipe Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #fafafa;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .recipe-list {
+            margin-bottom: 30px;
+        }
+
+        .recipe-item {
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .recipe-item:hover {
+            background: #f0f0f0;
+        }
+
+        #details {
+            padding: 20px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Recipe Viewer</h1>
+
+<h2>Recipes</h2>
+<div id="recipe-list" class="recipe-list"></div>
+
+<h2>Details</h2>
+<div id="details">
+    <p>Select a recipe to view details.</p>
+</div>
+
+<script>
+    // Load all recipes
+    async function loadRecipes() {
+        const res = await fetch("/api/recipes");
+        const recipes = await res.json();
+
+        const list = document.getElementById("recipe-list");
+        list.innerHTML = "";
+
+        recipes.forEach(recipe => {
+            const item = document.createElement("div");
+            item.className = "recipe-item";
+            item.textContent = recipe.name;
+
+            item.onclick = () => loadRecipeDetails(recipe.id);
+
+            list.appendChild(item);
+        });
+    }
+
+    // Load one recipe
+    async function loadRecipeDetails(id) {
+        const res = await fetch(`/api/recipes/${id}`);
+        const data = await res.json();
+
+        const details = document.getElementById("details");
+
+        details.innerHTML = `
+            <h3>${data.name}</h3>
+            <strong>Ingredients:</strong>
+            <p>${data.ingredients}</p>
+            <strong>Instructions:</strong>
+            <p>${data.instructions}</p>
+        `;
+    }
+
+    loadRecipes();
+</script>
+
+</body>
+</html>
