@@ -14,7 +14,6 @@ Data is stored in PostgreSQL, served by Flask, and rendered in the frontend UI.
 ## 📂 Project Structure
 
 three_tier_recipes_system/
-│
 ├── database/
 │ ├── Dockerfile
 │ └── init.sql
@@ -30,7 +29,6 @@ three_tier_recipes_system/
 │ └── nginx.conf
 │
 └── docker-compose.yml
-
 
 ---
 
@@ -112,34 +110,41 @@ All containers communicate over an internal Docker network.
 ### Run the full system:
 
 ```bash
-docker compose up --build```
+docker compose up --build
+```
 
 Stop containers:
-```
+```bash
 docker compose down
 ```
 
-🌍 Access the Application
-Frontend (UI):
+### 🌍 Access the Application
+#### Frontend (UI):
+
 http://localhost:8080
 
-Backend API (test endpoints):
+#### Backend API (test endpoints):
+
 http://localhost:5000/recipes
+
 http://localhost:5000/recipes/1
 
-PostgreSQL (from outside Docker):
+#### PostgreSQL (from outside Docker):
 port: 5432
+
 user: appuser
+
 password: apppassword
+
 database: recipesdb
 
-🧩 Architecture Diagram
+### 🧩 Architecture Diagram
 
 A detailed architecture diagram of the system:
 
 User Browser --> Nginx (Frontend) --> Flask (Backend) --> PostgreSQL (Database)
 
-✔ Requirements Achieved
+### ✔ Requirements Achieved
 
 Three-tier architecture ✔
 
