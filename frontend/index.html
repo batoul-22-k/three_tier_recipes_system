@@ -1,90 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Recipe Viewer</title>
+    <title>Recipe Viewer – Accordion</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background: #fafafa;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
-        h1 {
-            color: #333;
-        }
+    body {
+        margin: 40px;
+        font-family: Arial, sans-serif;
+        background: #fafafa;          /* same as simple version */
+    }
 
-        .recipe-list {
-            margin-bottom: 30px;
-        }
+    .accordion-container {
+        width: 90%;
+        max-width: 520px;
+        margin: 0 auto;
+    }
 
-        .recipe-item {
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            margin-bottom: 8px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
+    h1 {
+        color: #333;                  /* same as simple version */
+        margin: 0 0 20px;
+    }
 
-        .recipe-item:hover {
-            background: #f0f0f0;
-        }
+    .accordion {
+        border-radius: 6px;
+        overflow: hidden;
+        background: #fff;             /* white card */
+        border: 1px solid #ddd;       /* same border as simple */
+    }
 
-        #details {
-            padding: 20px;
-            background: #fff;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-    </style>
+    .accordion-item + .accordion-item {
+        border-top: 1px solid #ddd;
+    }
+
+    .accordion-header {
+        width: 100%;
+        padding: 10px 14px;
+        background: #fff;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+        color: #333;                  /* same text color */
+    }
+
+    .accordion-header:hover {
+        background: #f0f0f0;          /* same hover as simple */
+    }
+
+    .accordion-title {
+        font-weight: 600;
+    }
+
+    .accordion-icon {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .accordion-content {
+        background: #fff;
+        color: #333;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.35s ease;
+    }
+
+    .accordion-inner {
+        padding: 10px 14px 12px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .accordion-inner h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+    }
+
+    .accordion-inner strong {
+        display: block;
+        margin-top: 8px;
+        margin-bottom: 4px;
+    }
+
+    .accordion-item:first-child .accordion-header {
+        border-radius: 6px 6px 0 0;
+    }
+
+    .accordion-item:last-child.active .accordion-content {
+        border-radius: 0 0 6px 6px;
+    }
+
+    .accordion-item:last-child:not(.active) .accordion-header {
+        border-radius: 0 0 6px 6px;
+    }
+
+    .empty-message {
+        color: #777;
+        text-align: center;
+        margin-top: 10px;
+    }
+</style>
+
 </head>
 <body>
 
-<h1>Recipe Viewer</h1>
-
-<h2>Recipes</h2>
-<div id="recipe-list" class="recipe-list"></div>
-
-<h2>Details</h2>
-<div id="details">
-    <p>Select a recipe to view details.</p>
+<div class="accordion-container">
+    <h1>Recipe Viewer</h1>
+    <div id="accordion" class="accordion"></div>
+    <div id="empty-msg" class="empty-message" style="display:none;">
+        No recipes found.
+    </div>
 </div>
 
 <script>
-    // Load all recipes
     async function loadRecipes() {
-        const res = await fetch("/api/recipes");
-        const recipes = await res.json();
+        try {
+            const res = await fetch("/api/recipes");
+            const recipes = await res.json();
 
-        const list = document.getElementById("recipe-list");
-        list.innerHTML = "";
+            const accordion = document.getElementById("accordion");
+            const emptyMsg = document.getElementById("empty-msg");
+            accordion.innerHTML = "";
 
-        recipes.forEach(recipe => {
-            const item = document.createElement("div");
-            item.className = "recipe-item";
-            item.textContent = recipe.name;
+            if (!recipes || recipes.length === 0) {
+                emptyMsg.style.display = "block";
+                return;
+            } else {
+                emptyMsg.style.display = "none";
+            }
 
-            item.onclick = () => loadRecipeDetails(recipe.id);
+            recipes.forEach(recipe => {
+                const item = document.createElement("div");
+                item.className = "accordion-item";
 
-            list.appendChild(item);
-        });
+                const header = document.createElement("button");
+                header.className = "accordion-header";
+
+                const title = document.createElement("span");
+                title.className = "accordion-title";
+                title.textContent = recipe.name;
+
+                const icon = document.createElement("span");
+                icon.className = "accordion-icon";
+                icon.textContent = "+";
+
+                header.appendChild(title);
+                header.appendChild(icon);
+
+                const content = document.createElement("div");
+                content.className = "accordion-content";
+
+                const inner = document.createElement("div");
+                inner.className = "accordion-inner";
+
+                inner.innerHTML = `
+                    <strong>Ingredients:</strong>
+                    <p>${recipe.ingredients}</p>
+                    <strong>Instructions:</strong>
+                    <p>${recipe.instructions}</p>
+                `;
+
+                content.appendChild(inner);
+                item.appendChild(header);
+                item.appendChild(content);
+                accordion.appendChild(item);
+
+                header.addEventListener("click", () => toggleItem(item));
+            });
+        } catch (err) {
+            console.error("Failed to load recipes:", err);
+        }
     }
 
-    // Load one recipe
-    async function loadRecipeDetails(id) {
-        const res = await fetch(`/api/recipes/${id}`);
-        const data = await res.json();
+    function toggleItem(item) {
+        const allItems = document.querySelectorAll(".accordion-item");
 
-        const details = document.getElementById("details");
+        const isAlreadyActive = item.classList.contains("active");
 
-        details.innerHTML = `
-            <h3>${data.name}</h3>
-            <strong>Ingredients:</strong>
-            <p>${data.ingredients}</p>
-            <strong>Instructions:</strong>
-            <p>${data.instructions}</p>
-        `;
+        // close all
+        allItems.forEach(i => {
+            i.classList.remove("active");
+            const content = i.querySelector(".accordion-content");
+            const icon = i.querySelector(".accordion-icon");
+            if (content) content.style.maxHeight = null;
+            if (icon) icon.textContent = "+";
+        });
+
+        // open clicked if it was closed
+        if (!isAlreadyActive) {
+            const content = item.querySelector(".accordion-content");
+            const icon = item.querySelector(".accordion-icon");
+            item.classList.add("active");
+            content.style.maxHeight = content.scrollHeight + "px";
+            icon.textContent = "−";
+        }
     }
 
     loadRecipes();

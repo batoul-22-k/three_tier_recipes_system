@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   db:
@@ -18,8 +17,8 @@ services:
     container_name: recipes_backend
     environment:
       DB_HOST: db
-      DB_USER: postgres
-      DB_PASSWORD: ahmad1807
+      DB_USER: appuser
+      DB_PASSWORD: apppassword
       DB_NAME: recipesdb
       DB_PORT: 5432
     depends_on:
