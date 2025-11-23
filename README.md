@@ -12,7 +12,7 @@ Data is stored in PostgreSQL, served by Flask, and rendered in the frontend UI.
 ---
 
 ## 📂 Project Structure
-
+```
 three_tier_recipes_system/
 ├── database/
 │ ├── Dockerfile
@@ -29,7 +29,7 @@ three_tier_recipes_system/
 │ └── nginx.conf
 │
 └── docker-compose.yml
-
+```
 ---
 
 ## 🗄️ Database (PostgreSQL)
