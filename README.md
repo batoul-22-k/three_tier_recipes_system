@@ -112,9 +112,12 @@ All containers communicate over an internal Docker network.
 ### Run the full system:
 
 ```bash
-docker compose up --build
+docker compose up --build```
+
 Stop containers:
+```
 docker compose down
+```
 
 🌍 Access the Application
 Frontend (UI):
