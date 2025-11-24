@@ -7,8 +7,8 @@ app = Flask(__name__)
 DB_HOST = os.environ.get("DB_HOST", "db")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 DB_NAME = os.environ.get("DB_NAME", "recipesdb")
-DB_USER = os.environ.get("DB_USER", "postgres")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "ahmad1807")
+DB_USER = os.environ.get("DB_USER", "appuser")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "apppassword")
 
 
 def get_connection():
@@ -26,13 +26,22 @@ def get_recipes():
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT id, name FROM recipes;")
+    # return full recipe data
+    cur.execute("SELECT id, name, ingredients, instructions FROM recipes;")
     rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    recipes = [{"id": r[0], "name": r[1]} for r in rows]
+    recipes = [
+        {
+            "id": r[0],
+            "name": r[1],
+            "ingredients": r[2],
+            "instructions": r[3],
+        }
+        for r in rows
+    ]
     return jsonify(recipes)
 
 

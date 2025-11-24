@@ -121,7 +121,7 @@
 <script>
     async function loadRecipes() {
         try {
-            const res = await fetch("/api/recipes");
+            const res = await fetch("/recipes");
             const recipes = await res.json();
 
             const accordion = document.getElementById("accordion");
