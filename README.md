@@ -248,7 +248,7 @@ URL example:
 
 Below is the frontend showing all recipes:
 
-![Recipes List](images/recipes-list.png)
+![Recipes List](image.png)
 
 ## 🚨 NOTE: Nginx cannot reach the backend container.
 You are in Docker Compose mode, so the only correct backend hostname is:
