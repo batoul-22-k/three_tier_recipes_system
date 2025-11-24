@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-db
+  template:
+    metadata:
+      labels:
+        app: recipes-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          env:
+            - name: POSTGRES_USER
+              value: appuser
+            - name: POSTGRES_PASSWORD
+              value: apppassword
+            - name: POSTGRES_DB
+              value: recipesdb
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: postgres-storage
+          emptyDir: {}
+        - name: init-script
+          configMap:
+            name: recipes-init

@@ -159,3 +159,132 @@ Frontend container calling backend ✔
 Docker Compose orchestration ✔
 
 Fully functional system ✔
+
+
+## 1. Start Minikube & Enable Docker Build Inside Minikube
+
+``` powershell
+minikube start
+& minikube -p minikube docker-env | Invoke-Expression
+```
+
+Expected output:
+
+    Docker environment variables set for Minikube.
+
+## 2. Build Docker Images
+
+### Backend:
+
+``` powershell
+docker build -t three_tier_recipes_system-backend:latest ./backend
+```
+
+### Frontend:
+
+``` powershell
+docker build -t three_tier_recipes_system-frontend:latest ./frontend
+```
+
+## 3. Apply Kubernetes Manifests
+
+### Postgres ConfigMap
+
+``` powershell
+kubectl apply -f k8s/postgres-configmap.yaml
+```
+
+### Postgres Deployment & Service
+
+``` powershell
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/postgres-service.yaml
+```
+
+## 4. Reset Database
+
+``` powershell
+kubectl delete pod -l app=recipes-db
+```
+
+## 5. Verify Postgres Initialization
+
+``` powershell
+kubectl logs -l app=recipes-db
+```
+
+Expected:
+
+    running /docker-entrypoint-initdb.d/init.sql
+    INSERT 0 3
+
+## 6. Deploy Backend
+
+``` powershell
+kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/backend-service.yaml
+kubectl delete pod -l app=recipes-backend
+```
+
+## 7. Deploy Frontend
+
+``` powershell
+kubectl apply -f k8s/frontend-deployment.yaml
+kubectl apply -f k8s/frontend-service.yaml
+```
+
+## 8. Access Application
+
+``` powershell
+minikube service recipes-frontend
+```
+
+URL example:
+
+    http://192.168.49.2:30080
+
+
+## 9. Verify Frontend in Browser
+
+Below is the frontend showing all recipes:
+
+![Recipes List](images/recipes-list.png)
+
+## 🚨 NOTE: Nginx cannot reach the backend container.
+You are in Docker Compose mode, so the only correct backend hostname is:
+```
+recipes_backend
+```
+
+But your logs show that you are still using the Kubernetes hostname:
+```
+recipes-backend
+```
+
+Correct NGINX Config for Kubernetes
+
+Kubernetes service names **must use hyphens** (DNS-compliant):
+
+```
+recipes-backend
+```
+
+### ✔ Use this version of `nginx.conf` for K8s images:
+
+```nginx
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri /index.html;
+    }
+
+    location /recipes {
+        proxy_pass http://recipes-backend:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-frontend
+  template:
+    metadata:
+      labels:
+        app: recipes-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: three_tier_recipes_system-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80

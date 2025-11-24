@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-backend
+  template:
+    metadata:
+      labels:
+        app: recipes-backend
+    spec:
+      containers:
+      - name: backend
+        image: three_tier_recipes_system-backend:latest
+        imagePullPolicy: Never
+        env:
+          - name: DB_HOST
+            value: "recipes-db"
+          - name: DB_USER
+            value: "appuser"
+          - name: DB_PASSWORD
+            value: "apppassword"
+          - name: DB_NAME
+            value: "recipesdb"
+          - name: DB_PORT
+            value: "5432"
+        ports:
+        - containerPort: 5000
