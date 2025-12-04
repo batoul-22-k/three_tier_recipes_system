@@ -73,17 +73,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: recipes-backend
+  name: backend
   namespace: recipes-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: recipes-backend
+      app: backend
   template:
     metadata:
       labels:
-        app: recipes-backend
+        app: backend
     spec:
       containers:
         - name: backend
@@ -115,11 +115,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: recipes-backend
+  name: backend
   namespace: recipes-app
 spec:
   selector:
-    app: recipes-backend
+    app: backend
   ports:
     - port: 5000
       targetPort: 5000
@@ -157,6 +157,6 @@ spec:
   selector:
     app: recipes-frontend
   ports:
-    - port: 80
-      targetPort: 80
-      nodePort: 30080
+    - port: 80          # Service port
+      targetPort: 80    # Port exposed by the container
+      nodePort: 30080   # Exposed on localhost:30080

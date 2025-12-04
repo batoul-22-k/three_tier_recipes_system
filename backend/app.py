@@ -73,3 +73,46 @@ def get_recipe(recipe_id):
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
+from flask import Flask, jsonify, request   # add request here
+# ... rest of imports and config ...
+
+@app.route("/recipes", methods=["POST"])
+def create_recipe():
+    data = request.json
+
+    name = data.get("name")
+    ingredients = data.get("ingredients")
+    instructions = data.get("instructions")
+
+    if not name or not ingredients or not instructions:
+        return jsonify({"error": "Missing fields"}), 400
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO recipes (name, ingredients, instructions) VALUES (%s, %s, %s) RETURNING id;",
+        (name, ingredients, instructions),
+    )
+    recipe_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({"message": "Recipe added", "id": recipe_id}), 201
+
+@app.route("/recipes/<int:recipe_id>", methods=["DELETE"])
+def delete_recipe(recipe_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM recipes WHERE id = %s RETURNING id;", (recipe_id,))
+    deleted = cur.fetchone()
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    if deleted is None:
+        return jsonify({"error": "Recipe not found"}), 404
+
+    return jsonify({"message": "Recipe deleted"}), 200
