@@ -4,14 +4,8 @@ NAMESPACE=recipes-app
 # Deploy all Kubernetes resources
 k8s-deploy:
 	kubectl create namespace $(NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -n $(NAMESPACE) -f k8s/postgres-pvc.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/postgres-configmap.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/postgres-deployment.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/postgres-service.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/backend-deployment.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/backend-service.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/frontend-deployment.yaml
-	kubectl apply -n $(NAMESPACE) -f k8s/frontend-service.yaml
+	kubectl apply -n $(NAMESPACE) -f k8s/recipes-app.yaml
+
 
 # Show status of all resources
 k8s-status:
